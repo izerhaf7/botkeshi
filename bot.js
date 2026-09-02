@@ -836,7 +836,7 @@ async function startBot() {
       return;
     }
 
-    if (lower === "1" || lower === "aplikasi premium") {
+    if (lower === "1" || lower === "aplikasi premium" || lower === "appsmenu") {
       const defaultText =
         "*APLIKASI PREMIUM YANG TERSEDIA*\n\n" +
         "- Netflix\n" +
@@ -1116,11 +1116,12 @@ KeshiStore.idn Gemini AI ✅
       return;
     }
 
-    if (
+   if (
       lower === "2" ||
       lower === "sosmed" ||
       lower === "sosial media" ||
-      lower === "kebutuhan sosmed"
+      lower === "kebutuhan sosmed" ||
+      lower === "sosmedmenu"
     ) {
       const defaultText = "*KEBUTUHAN SOSMED*\n" + "• TikTok\n" + "• Instagram";
 
@@ -1134,7 +1135,9 @@ KeshiStore.idn Gemini AI ✅
       lower === "top up" ||
       lower === "topup" ||
       lower === "top up game" ||
-      lower === "topup game"
+      lower === "topup game" ||
+      lower === "gamesmenu" ||
+      lower === "gamemenu"
     ) {
       const defaultText =
         "*TOP UP GAME YANG TERSEDIA*\n" +
