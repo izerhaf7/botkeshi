@@ -6,6 +6,11 @@ import makeWASocket, {
 import Pino from "pino";
 import qrcode from "qrcode-terminal";
 import { readFileSync, writeFileSync, existsSync } from "fs";
+import { setDefaultAutoSelectFamilyAttemptTimeout } from "net";
+
+// Node default cuma kasih 250ms per percobaan IPv6/IPv4 (happy eyeballs).
+// Di WSL itu kependekan -> koneksi ke WhatsApp ETIMEDOUT (code 408). Naikin jadi 2 detik.
+setDefaultAutoSelectFamilyAttemptTimeout(2000);
 
 const CONFIG_PATH = "./config.json";
 
@@ -18,7 +23,8 @@ async function startBot() {
   let OWNER_BARES = [];
 
   // tempat nyimpen update list dari owner (key -> isi baru) SEMUA LOWERCASE
-  let REPLIES = {};
+  // null-prototype: biar key kayak "constructor" nggak kebaca dari Object.prototype
+  let REPLIES = Object.create(null);
 
   // helper: ambil bare id dari JID
   const getBare = (jid) => {
@@ -45,7 +51,7 @@ async function startBot() {
             }
 
             if (parsed.replies && typeof parsed.replies === "object") {
-              REPLIES = parsed.replies;
+              REPLIES = Object.assign(Object.create(null), parsed.replies);
             }
           }
         }
@@ -109,8 +115,10 @@ async function startBot() {
 
       console.log("Connection closed, code:", statusCode);
       if (shouldReconnect) {
-        console.log("Reconnect...");
-        startBot();
+        console.log("Reconnect 3 detik lagi...");
+        setTimeout(() => {
+          startBot().catch((err) => console.error("Error startBot:", err));
+        }, 3000);
       } else {
         console.log("Logged out, harus scan ulang nanti.");
       }
@@ -1184,7 +1192,7 @@ note :
 
     if (lower === "qris") {
       try {
-        const imageBuffer = readFileSync("./assets/QRIS KESHI.JPG");
+        const imageBuffer = readFileSync("./assets/QRIS KESHI.jpg");
         await sock.sendMessage(
           from,
           {
@@ -1201,7 +1209,7 @@ note :
           from,
           {
             text:
-              "Gagal mengirim QRIS. Cek file *QRIS KESHI.JPG* di folder *assets* (nama & path harus pas).",
+              "Gagal mengirim QRIS. Cek file *QRIS KESHI.jpg* di folder *assets* (nama & path harus pas).",
           },
           { quoted: msg }
         );
